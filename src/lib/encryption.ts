@@ -4,8 +4,11 @@ const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
 
 function getEncryptionKey(): Buffer {
-  const key = process.env.ENCRYPTION_KEY || 'dev-key-32-bytes-for-local-only!!';
-  const keyBuffer = Buffer.from(key, 'utf8');
+  const key = process.env.ENCRYPTION_KEY;
+  if (!key && process.env.NODE_ENV === 'production') {
+    throw new Error('ENCRYPTION_KEY environment variable is required in production');
+  }
+  const keyBuffer = Buffer.from(key ?? 'dev-key-32-bytes-for-local-only!!', 'utf8');
   if (keyBuffer.length < 32) {
     return Buffer.concat([keyBuffer, Buffer.alloc(32 - keyBuffer.length)]);
   }

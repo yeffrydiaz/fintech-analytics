@@ -36,7 +36,8 @@ export interface TaxReportSummary {
   netGainLoss: number;
 }
 
-const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+// Long-term holding requires MORE than 365 days (i.e., at least 366 days)
+const ONE_YEAR_MS = 366 * 24 * 60 * 60 * 1000;
 
 export function isLongTermHolding(purchaseDate: Date, saleDate: Date): boolean {
   return saleDate.getTime() - purchaseDate.getTime() >= ONE_YEAR_MS;
