@@ -26,6 +26,9 @@ const nextConfig = {
             value: 'strict-origin-when-cross-origin',
           },
           {
+            // NOTE: 'unsafe-eval' is required by Next.js for its runtime bundling and hot-reload
+            // mechanisms. 'unsafe-inline' is needed for Tailwind's style injection.
+            // For stricter production CSP, consider using nonce-based CSP with Next.js middleware.
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
