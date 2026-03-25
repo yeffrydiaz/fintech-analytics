@@ -11,9 +11,12 @@ const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        // TODO: Replace with real database lookup before deploying to production.
-        // Demo-only: accepts a fixed credential pair exclusively outside of production.
+        // Demo-only: requires explicit ENABLE_DEMO_AUTH=true opt-in AND a
+        // matching DEMO_PASSWORD so that demo credentials never work on a
+        // publicly accessible deployment unless both env vars are set.
+        // TODO: Replace with real database lookup before any production deployment.
         if (
+          process.env.ENABLE_DEMO_AUTH === 'true' &&
           process.env.NODE_ENV !== 'production' &&
           credentials?.email === 'demo@example.com' &&
           credentials?.password === process.env.DEMO_PASSWORD

@@ -58,9 +58,11 @@ export function calculateRealizedGains(
   for (const tx of sorted) {
     if (tx.type === 'BUY') {
       const existingLots = lots.get(tx.symbol) || [];
+      // costBasisPerShare: total cost (price × qty + fees) divided by qty
+      const costBasisPerShare = (tx.price * tx.quantity + tx.fees) / tx.quantity;
       existingLots.push({
         quantity: tx.quantity,
-        costBasis: (tx.price * tx.quantity + tx.fees) / tx.quantity,
+        costBasis: costBasisPerShare,
         purchaseDate: tx.executedAt,
       });
       lots.set(tx.symbol, existingLots);
