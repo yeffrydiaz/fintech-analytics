@@ -11,7 +11,11 @@ const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (credentials?.email === 'demo@example.com' && credentials?.password === 'demo') {
+        if (
+          process.env.NODE_ENV !== 'production' &&
+          credentials?.email === 'demo@example.com' &&
+          credentials?.password === 'demo'
+        ) {
           return { id: '1', email: 'demo@example.com', name: 'Demo User' };
         }
         return null;

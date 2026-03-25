@@ -37,10 +37,11 @@ export interface TaxReportSummary {
 }
 
 // Long-term holding requires MORE than 365 days (i.e., at least 366 days)
-const ONE_YEAR_MS = 366 * 24 * 60 * 60 * 1000;
+// Holdings must be held for more than 365 days (at least 366 days) to qualify as long-term
+const LONG_TERM_THRESHOLD_MS = 366 * 24 * 60 * 60 * 1000;
 
 export function isLongTermHolding(purchaseDate: Date, saleDate: Date): boolean {
-  return saleDate.getTime() - purchaseDate.getTime() >= ONE_YEAR_MS;
+  return saleDate.getTime() - purchaseDate.getTime() >= LONG_TERM_THRESHOLD_MS;
 }
 
 export function calculateRealizedGains(
