@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String      @id @default(cuid())
+  email         String      @unique
+  name          String?
+  encryptedData String?
+  portfolios    Portfolio[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Portfolio {
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assets       Asset[]
+  transactions Transaction[]
+  taxReports   TaxReport[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([userId])
+}
+
+model Asset {
+  id           String        @id @default(cuid())
+  symbol       String
+  name         String
+  assetType    AssetType     @default(STOCK)
+  quantity     Decimal       @db.Decimal(18, 8)
+  averageCost  Decimal       @db.Decimal(18, 8)
+  currentPrice Decimal       @db.Decimal(18, 8)
+  portfolioId  String
+  portfolio    Portfolio     @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@unique([portfolioId, symbol])
+  @@index([portfolioId])
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  type        TransactionType
+  symbol      String
+  quantity    Decimal         @db.Decimal(18, 8)
+  price       Decimal         @db.Decimal(18, 8)
+  totalAmount Decimal         @db.Decimal(18, 8)
+  fees        Decimal         @db.Decimal(18, 8) @default(0)
+  notes       String?
+  executedAt  DateTime        @default(now())
+  portfolioId String
+  portfolio   Portfolio       @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  assetId     String?
+  asset       Asset?          @relation(fields: [assetId], references: [id])
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([portfolioId])
+  @@index([executedAt])
+}
+
+model TaxReport {
+  id          String    @id @default(cuid())
+  taxYear     Int
+  totalGains  Decimal   @db.Decimal(18, 2)
+  totalLosses Decimal   @db.Decimal(18, 2)
+  netGainLoss Decimal   @db.Decimal(18, 2)
+  reportData  Json
+  portfolioId String
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  generatedAt DateTime  @default(now())
+
+  @@unique([portfolioId, taxYear])
+  @@index([portfolioId])
+}
+
+enum AssetType {
+  STOCK
+  ETF
+  CRYPTO
+  BOND
+  MUTUAL_FUND
+  OTHER
+}
+
+enum TransactionType {
+  BUY
+  SELL
+  DIVIDEND
+  SPLIT
+}
